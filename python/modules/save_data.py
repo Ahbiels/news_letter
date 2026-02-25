@@ -1,7 +1,7 @@
 class SaveData():
     def __init__(self, data):
         self.data = data
-        self.title = []
+        self.title = self.get_title()
 
     def get_title(self):
         self.title = [
