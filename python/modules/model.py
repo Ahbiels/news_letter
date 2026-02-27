@@ -14,12 +14,14 @@ MODEL_NAME = str(os.getenv("MODEL_NAME"))
 
 CREDENTIALS = service_account.Credentials.from_service_account_file('./credentials.json')
 class Model(SaveData):
-    def __init__(self, data, log):
+    def __init__(self, data, log, cursor):
         self.model_name = os.getenv("model_name")
         self.model = any
         self.ranking_prompt, self.summary_prompt = self.define_prompt()
         self.log = log
         self.content = ""
+        self.cursor = cursor
+        self.news_summary = []
         super().__init__(data)
 
     def create_model(self, occur, temperature, top_k, top_p, max_tokens):
@@ -46,18 +48,18 @@ class Model(SaveData):
             json.dump(data, f, indent=4, ensure_ascii=False)
     
     def define_ranking(self):
-        self.create_model(1, 0.2, 2, 0.5, 800)
+        self.create_model(1, 0.2, 2, 0.5, 1500)
         template_ranking = PromptTemplate.from_template(self.ranking_prompt).format(input=self.title)
         response = self.model.invoke(template_ranking)
         score_match = re.search(r'OUTPUT_SCORE\s*=\s*(\[[^\]]+\])', response.content)
         repeated_match = re.search(r'OUTPUT_REPEATED\s*=\s*(\[[^\]]+\])', response.content)
-
         # Converte true/false para True/False (Python)
+        print(response.content)
         repeated_str = repeated_match.group(1).replace("true", "True").replace("false", "False")
-
         # Converte string para lista Python
         score_list = ast.literal_eval(score_match.group(1))
         repeated_list = ast.literal_eval(repeated_str)
+        
         for i, score in enumerate(score_list):
             self.data[i]["score"] = float(score)
             self.data[i]["no_repeated"] = repeated_list[i]
@@ -76,12 +78,37 @@ class Model(SaveData):
         self.content = response.content
         self.log.info = f"Summary Done"
         
+    def split_data(self):
+        titles_match = re.search(r'OUTPUT_TITLE\s*=\s*(\[[^\]]+\])', self.content)
+        summaries_match = re.search(r'OUTPUT_SUMMARY\s*=\s*(\[[^\]]+\])', self.content)
+        
+        try:
+            summaries_str = ast.literal_eval(summaries_match.group(1))
+            titles_str = ast.literal_eval(titles_match.group(1))
+        except Exception as e:
+            print(e)
+            
+        
+        self.news_summary = [{"title": title, "summary": summary} for title, summary in zip(titles_str, summaries_str)]
+    
+    def catching_users(self):
+        # cursor = self.db_conn.cursor()
+        self.cursor.execute("SELECT * FROM users.users")
+        results = self.cursor.fetchall()
+        for result in results:
+            name = "{} {}".format(result[1], result[2])
+            email = result[3]
+            self.send_newsletter(name, email)
+
+    def send_newsletter(self, name, email):
+        print(name, email)
         
             
     def init(self):
         self.define_ranking()
         self.summary_news()
+        self.split_data()
+        self.catching_users()
         
-        print(self.content)
     
         

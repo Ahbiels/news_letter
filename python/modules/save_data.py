@@ -7,4 +7,5 @@ class SaveData():
         self.title = [
             title["title"] for title in self.data
         ]
+        self.data
         return self.title
