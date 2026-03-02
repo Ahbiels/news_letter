@@ -13,6 +13,21 @@ Rules:
 - The titles should be short and easy to read.
 - Everything in Portuguese
 
+<EXAMPLE>
+
+OUTPUT_TITLE = [
+    "Google Gemini Invadido: Chaves Secretas Expostas!",
+    "IA Demite em Massa: Twitter Sofre 'Efeito Dorsey'!",
+    ...
+]
+
+OUTPUT_SUMMARY = [
+    "...",
+    ...
+]
+
+</EXAMPLE>
+
 {input}
 
 OUTPUT_TITLE

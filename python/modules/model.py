@@ -54,7 +54,6 @@ class Model(SaveData):
         score_match = re.search(r'OUTPUT_SCORE\s*=\s*(\[[^\]]+\])', response.content)
         repeated_match = re.search(r'OUTPUT_REPEATED\s*=\s*(\[[^\]]+\])', response.content)
         # Converte true/false para True/False (Python)
-        print(response.content)
         repeated_str = repeated_match.group(1).replace("true", "True").replace("false", "False")
         # Converte string para lista Python
         score_list = ast.literal_eval(score_match.group(1))
@@ -79,6 +78,7 @@ class Model(SaveData):
         self.log.info = f"Summary Done"
         
     def split_data(self):
+        print(self.content)
         titles_match = re.search(r'OUTPUT_TITLE\s*=\s*(\[[^\]]+\])', self.content)
         summaries_match = re.search(r'OUTPUT_SUMMARY\s*=\s*(\[[^\]]+\])', self.content)
         
