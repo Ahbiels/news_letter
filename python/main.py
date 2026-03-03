@@ -4,6 +4,7 @@ from modules.save_data import SaveData
 from modules.model import Model
 from modules.log import Log
 from modules.conn import conn
+from modules.send_email import SendEmail
 
 
 def GetData() -> list:
@@ -16,8 +17,10 @@ if __name__ == "__main__":
     log.info = "Starting"
     db_conn = conn(log)
     data = GetData()
-    model = Model(data, log, db_conn.cursor())
-    model.init()
+    model = Model(data, log)
+    news_summary = model.init()
+    print(3)
+    SendEmail(news_summary,db_conn.cursor(),log)
     # log.info = "Ending"
     db_conn.close()
     

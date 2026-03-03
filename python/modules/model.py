@@ -14,13 +14,12 @@ MODEL_NAME = str(os.getenv("MODEL_NAME"))
 
 CREDENTIALS = service_account.Credentials.from_service_account_file('./credentials.json')
 class Model(SaveData):
-    def __init__(self, data, log, cursor):
+    def __init__(self, data, log):
         self.model_name = os.getenv("model_name")
         self.model = any
         self.ranking_prompt, self.summary_prompt = self.define_prompt()
         self.log = log
         self.content = ""
-        self.cursor = cursor
         self.news_summary = []
         super().__init__(data)
 
@@ -78,37 +77,22 @@ class Model(SaveData):
         self.log.info = f"Summary Done"
         
     def split_data(self):
-        print(self.content)
         titles_match = re.search(r'OUTPUT_TITLE\s*=\s*(\[[^\]]+\])', self.content)
         summaries_match = re.search(r'OUTPUT_SUMMARY\s*=\s*(\[[^\]]+\])', self.content)
         
         try:
             summaries_str = ast.literal_eval(summaries_match.group(1))
             titles_str = ast.literal_eval(titles_match.group(1))
+            self.news_summary = [{"title": title, "summary": summary} for title, summary in zip(titles_str, summaries_str)]
         except Exception as e:
             print(e)
-            
-        
-        self.news_summary = [{"title": title, "summary": summary} for title, summary in zip(titles_str, summaries_str)]
-    
-    def catching_users(self):
-        # cursor = self.db_conn.cursor()
-        self.cursor.execute("SELECT * FROM users.users")
-        results = self.cursor.fetchall()
-        for result in results:
-            name = "{} {}".format(result[1], result[2])
-            email = result[3]
-            self.send_newsletter(name, email)
-
-    def send_newsletter(self, name, email):
-        print(name, email)
-        
             
     def init(self):
         self.define_ranking()
         self.summary_news()
         self.split_data()
-        self.catching_users()
+        
+        return self.news_summary
         
     
         
