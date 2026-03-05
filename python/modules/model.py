@@ -84,6 +84,7 @@ class Model(SaveData):
             summaries_str = ast.literal_eval(summaries_match.group(1))
             titles_str = ast.literal_eval(titles_match.group(1))
             self.news_summary = [{"title": title, "summary": summary} for title, summary in zip(titles_str, summaries_str)]
+            self.save_data(self.news_summary, 'news_summary.json')
         except Exception as e:
             print(e)
             

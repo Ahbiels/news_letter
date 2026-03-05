@@ -20,7 +20,7 @@ if __name__ == "__main__":
     model = Model(data, log)
     news_summary = model.init()
     print(3)
-    SendEmail(news_summary,db_conn.cursor(),log)
+    # SendEmail(news_summary,db_conn.cursor(),log)
     # log.info = "Ending"
     db_conn.close()
     
