@@ -43,7 +43,7 @@ class Model(SaveData):
         return template_ranking, template_summary
     
     def save_data(self, data, filename):
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(f"../examples/{filename}", 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
     
     def define_ranking(self):
